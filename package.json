@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/storycloud/webkit-assign.git"
+    "url": "https://github.com/StoryCloud/webkit-assign.git"
   },
   "keywords": [
     "bugfix",
@@ -24,9 +24,9 @@
   "author": "Jackson Ray Hamilton",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/storycloud/webkit-assign/issues"
+    "url": "https://github.com/StoryCloud/webkit-assign/issues"
   },
-  "homepage": "https://github.com/storycloud/webkit-assign",
+  "homepage": "https://github.com/StoryCloud/webkit-assign",
   "dependencies": {
     "async": "^1.2.0",
     "graceful-fs": "^3.0.8",
