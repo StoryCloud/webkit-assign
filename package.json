@@ -1,0 +1,39 @@
+{
+  "name": "webkit-assign",
+  "version": "0.0.0",
+  "description": "Fix property assignment on WebKit",
+  "main": "index.js",
+  "bin": {
+    "webkit-assign": "./cli.js"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/storycloud/webkit-assign.git"
+  },
+  "keywords": [
+    "bugfix",
+    "Object.create",
+    "property",
+    "assignment",
+    "webkit",
+    "angular"
+  ],
+  "author": "Jackson Ray Hamilton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/storycloud/webkit-assign/issues"
+  },
+  "homepage": "https://github.com/storycloud/webkit-assign",
+  "dependencies": {
+    "async": "^1.2.0",
+    "graceful-fs": "^3.0.8",
+    "line-reader": "^0.2.4",
+    "lodash": "^3.9.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  }
+}
