@@ -2,10 +2,9 @@
 
 var _ = require('lodash');
 var async = require('async');
-var escodegen = require('escodegen');
-var esprima = require('esprima');
 var fs = require('graceful-fs');
 var path = require('path');
+var recast = require('recast');
 
 /**
  * Extension to append to files to distinguish them from their original
@@ -59,9 +58,9 @@ var DIRECTIVES = ['use strict'];
  * the code.
  */
 var transformCode = function (rawCodeString) {
-    var ast = esprima.parse(rawCodeString);
+    var ast = recast.parse(rawCodeString);
     var propertyNames = [];
-    traverse(ast, function (node) {
+    traverse(ast.program, function (node) {
         var propertyName;
         if (node.type === 'AssignmentExpression') {
             if (node.left.type === 'MemberExpression' && node.left.computed === false) {
@@ -103,7 +102,7 @@ var transformCode = function (rawCodeString) {
     // the code (by placing code before the directive prelude, which would
     // negate any would-be directives).
     var startIndex = 0;
-    _.forEach(ast.body, function (node, index) {
+    _.forEach(ast.program.body, function (node, index) {
         if (
             node.type === 'ExpressionStatement' &&
             node.expression.type === 'Literal' &&
@@ -115,8 +114,11 @@ var transformCode = function (rawCodeString) {
         }
     });
     // Insert the variable declaration at that safe index.
-    ast.body.splice.apply(ast.body, [startIndex, 0].concat(variableDeclaration));
-    return escodegen.generate(ast) + '\n'; // Add *nixy trailing newline.
+    ast.program.body.splice.apply(
+        ast.program.body,
+        [startIndex, 0].concat(variableDeclaration)
+    );
+    return recast.print(ast).code;
 };
 
 /**

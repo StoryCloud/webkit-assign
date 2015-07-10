@@ -29,10 +29,9 @@
   "homepage": "https://github.com/StoryCloud/webkit-assign",
   "dependencies": {
     "async": "^1.2.0",
-    "escodegen": "^1.6.1",
-    "esprima": "^2.4.1",
     "graceful-fs": "^3.0.8",
-    "lodash": "^3.9.3"
+    "lodash": "^3.9.3",
+    "recast": "^0.10.19"
   },
   "devDependencies": {
     "mocha": "^2.2.5"
