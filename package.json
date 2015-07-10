@@ -1,6 +1,6 @@
 {
   "name": "webkit-assign",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fix property assignment on WebKit",
   "main": "index.js",
   "bin": {
