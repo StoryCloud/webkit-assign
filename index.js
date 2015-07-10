@@ -91,7 +91,7 @@ var transformCode = function (rawCodeString) {
                 type: 'Literal',
                 value: propertyName
             }
-        }
+        };
         return declarations.concat(variableDeclarator);
     }, []);
     var variableDeclaration = {
