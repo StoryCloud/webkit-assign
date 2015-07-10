@@ -28,6 +28,12 @@ describe('replace', function () {
     it('should replace properties with variables', function (done) {
         inputOutputTest('replace', done);
     });
+    it('should preserve directive placement', function (done) {
+        inputOutputTest('directive', done);
+    });
+    it('should preserve whitespace', function (done) {
+        inputOutputTest('whitespace', done);
+    });
     it('should rock angular\'s socks off', function (done) {
         inputOutputTest('angular', done);
     });

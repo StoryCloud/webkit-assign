@@ -30,8 +30,8 @@
   "dependencies": {
     "async": "^1.2.0",
     "graceful-fs": "^3.0.8",
-    "line-reader": "^0.2.4",
-    "lodash": "^3.9.3"
+    "lodash": "^3.9.3",
+    "recast": "^0.10.19"
   },
   "devDependencies": {
     "mocha": "^2.2.5"

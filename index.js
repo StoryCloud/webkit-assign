@@ -4,7 +4,7 @@ var _ = require('lodash');
 var async = require('async');
 var fs = require('graceful-fs');
 var path = require('path');
-var lineReader = require('line-reader');
+var recast = require('recast');
 
 /**
  * Extension to append to files to distinguish them from their original
@@ -29,96 +29,139 @@ var getOutputFile = function (file) {
 };
 
 /**
- * Given the string "object.foo += 5", returns the following matches:
- *
- * 1: foo
- * 2: (1 space)
- * 3: +=
+ * Traverse the SpiderMonkey AST node, calling `iteratee` on `node` and its
+ * children.
  */
-var getPattern = function () {
-    return new RegExp([
-        // Match a property dot access.
-        '\\.\\s*([_$a-zA-Z\\xA0-\\uFFFF][_$a-zA-Z0-9\\xA0-\\uFFFF]*)',
-        // Preserve arbitrary whitespace or newlines. If there is a comment
-        // here, sucks to be you. Have to capture this for replacement.
-        '(\\s*)',
-        // Accept any assignment operator.
-        '(' + _.map([
-            '=',
-            '+=',
-            '-=',
-            '/=',
-            '%=',
-            '<<=',
-            '>>=',
-            '>>>=',
-            '&=',
-            '^=',
-            '|='
-        ], _.escapeRegExp).join('|') + ')',
-        // Refuse an equality operator. Have to capture this for
-        // replacement.
-        '([^=])'
-    ].join(''), 'g');
+var traverse = function traverse(node, iteratee) {
+    iteratee(node);
+    _.forOwn(node, function (child) {
+        if (_.isObject(child)) {
+            if (_.isArray(child)) {
+                _.forEach(child, function (node) {
+                    traverse(node, iteratee);
+                });
+            } else {
+                traverse(child, iteratee);
+            }
+        }
+    });
 };
 
+var getNumberOfLines = function (string) {
+    return string.split(/\r\n|\r|\n/).length;
+};
+
+/**
+ * Current the only directive is the Use Strict Directive (14.1.1).
+ */
+var DIRECTIVES = ['use strict'];
+
+/**
+ * Replace all instances of dot property assignment with bracket notation
+ * assignment in `rawCodeString`. Return a transformed and formatted version of
+ * the code.
+ */
+var transformCode = function (rawCodeString) {
+    var ast = recast.parse(rawCodeString);
+    var propertyNames = [];
+    traverse(ast.program, function (node) {
+        var propertyName;
+        if (node.type === 'AssignmentExpression') {
+            if (node.left.type === 'MemberExpression' && node.left.computed === false) {
+                propertyName = node.left.property.name;
+                propertyNames.push(propertyName);
+                // Use bracket notation for the assignment.
+                _.merge(node.left, {
+                    computed: true,
+                    property: {
+                        type: 'Identifier',
+                        name: NAMESPACE + propertyName
+                    }
+                });
+            }
+        }
+    });
+    // Generate "enum" variable declarations for all the strings needed for
+    // bracket notation assignments.
+    var declarations = _.reduce(propertyNames, function (declarations, propertyName) {
+        var variableDeclarator = {
+            type: 'VariableDeclarator',
+            id: {
+                type: 'Identifier',
+                name: NAMESPACE + propertyName
+            },
+            init: {
+                type: 'Literal',
+                value: propertyName
+            }
+        };
+        return declarations.concat(variableDeclarator);
+    }, []);
+    var variableDeclaration = {
+        type: 'VariableDeclaration',
+        declarations: declarations,
+        kind: 'var'
+    };
+    // Find the index of the first non-directive to avoid functionally changing
+    // the code (by placing code before the directive prelude, which would
+    // negate any would-be directives).
+    var startIndex = 0;
+    var startNode;
+    _.forEach(ast.program.body, function (node, index) {
+        if (
+            node.type === 'ExpressionStatement' &&
+            node.expression.type === 'Literal' &&
+            _.contains(DIRECTIVES, node.expression.value)
+        ) {
+            startIndex = index + 1;
+            startNode = node;
+        } else {
+            return false;
+        }
+    });
+    // Insert the variable declaration at that safe index.
+    ast.program.body.splice.apply(
+        ast.program.body,
+        [startIndex, 0].concat(variableDeclaration)
+    );
+    var printedCode = recast.print(ast).code;
+    // Remove the mysterious extraneous leading whitespace recast sometimes adds.
+    printedCode = printedCode.replace(/^\s+/, '');
+    // Detect when recast added a newline after or before the variable
+    // declaration.
+    var offendingLine, occurrence;
+    if (getNumberOfLines(printedCode) > getNumberOfLines(rawCodeString)) {
+        // Seek out the newline that was added. It might have been after the
+        // last directive if there were any, else the end of the variable
+        // declaration.
+        offendingLine = startNode ?
+            startNode.loc.end.line :
+            1;
+        occurrence = 0;
+        printedCode = printedCode.replace(/\r\n|\r|\n/g, function (match) {
+            occurrence += 1;
+            return occurrence === offendingLine ? '' : match;
+        });
+    }
+    return printedCode;
+};
+
+/**
+ * Create a transformed version of each file in `files`, where the transformed
+ * version of "script.js" is called "script.webkitassign.js". Invoke `callback`
+ * when done.
+ */
 var webkitAssign = function (files, callback) {
     async.each(files, function (file, callback) {
-        var names = [];
         var outputFile = getOutputFile(file);
-        // We have to prepend a var statement to the output file, but since we
-        // don't want to buffer the whole file into memory, we'll write it
-        // twice, the second time around prepending the statement.
-        var temporaryOutputFile = outputFile + '.temporary';
-        var writeStream = fs.createWriteStream(temporaryOutputFile);
-        lineReader.eachLine(file, function (line, last) {
-            // Restore the newline for the sake of the regular expression.
-            line += '\n';
-            var pattern = getPattern();
-            var match, name;
-            // There might be multiple matches per line thanks to multiple
-            // assignment.
-            do {
-                match = pattern.exec(line);
-                if (match === null) {
-                    break;
-                }
-                name = match[1];
-                if (!_.contains(names, name)) {
-                    names.push(name);
-                }
-            } while (true);
-            // Replace this code
-            //
-            //   object.foo +=
-            //
-            // with this
-            //
-            //   object[__webkitAssign__foo] +=
-            //
-            line = line.replace(pattern, '[' + NAMESPACE + '$1]$2$3$4');
-            writeStream.write(line);
-            if (last) {
-                writeStream.end(function () {
-                    var readStream = fs.createReadStream(temporaryOutputFile);
-                    var writeStream = fs.createWriteStream(outputFile);
-                    // From this array
-                    //
-                    //   ['$foo', '$bar']
-                    //
-                    // produce this code
-                    //
-                    //   var __webkitAssign__foo = 'foo', __webkitAssign__bar = 'bar';
-                    //
-                    var variableInitialiser = 'var ' + _.map(names, function (name) {
-                        return NAMESPACE + name + ' = ' + '\'' + name + '\'';
-                    }).join(', ') + ';';
-                    writeStream.write(variableInitialiser);
-                    readStream.pipe(writeStream);
-                    readStream.on('end', function () {
-                        fs.unlink(temporaryOutputFile, callback);
-                    });
-                });
+        fs.readFile(file, {
+            encoding: 'utf8'
+        }, function (error, contents) {
+            if (error) {
+                callback(error);
+            } else {
+                var transformedCode = transformCode(contents);
+                fs.writeFile(outputFile, transformedCode, callback);
             }
         });
     }, callback);
