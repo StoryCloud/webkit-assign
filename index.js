@@ -47,6 +47,10 @@ var traverse = function traverse(node, iteratee) {
     });
 };
 
+var getNumberOfLines = function (string) {
+    return string.split(/\r\n|\r|\n/).length;
+};
+
 /**
  * Current the only directive is the Use Strict Directive (14.1.1).
  */
@@ -102,6 +106,7 @@ var transformCode = function (rawCodeString) {
     // the code (by placing code before the directive prelude, which would
     // negate any would-be directives).
     var startIndex = 0;
+    var startNode;
     _.forEach(ast.program.body, function (node, index) {
         if (
             node.type === 'ExpressionStatement' &&
@@ -109,6 +114,7 @@ var transformCode = function (rawCodeString) {
             _.contains(DIRECTIVES, node.expression.value)
         ) {
             startIndex = index + 1;
+            startNode = node;
         } else {
             return false;
         }
@@ -118,7 +124,26 @@ var transformCode = function (rawCodeString) {
         ast.program.body,
         [startIndex, 0].concat(variableDeclaration)
     );
-    return recast.print(ast).code;
+    var printedCode = recast.print(ast).code;
+    // Remove the mysterious extraneous leading whitespace recast sometimes adds.
+    printedCode = printedCode.replace(/^\s+/, '');
+    // Detect when recast added a newline after or before the variable
+    // declaration.
+    var offendingLine, occurrence;
+    if (getNumberOfLines(printedCode) > getNumberOfLines(rawCodeString)) {
+        // Seek out the newline that was added. It might have been after the
+        // last directive if there were any, else the end of the variable
+        // declaration.
+        offendingLine = startNode ?
+            startNode.loc.end.line :
+            1;
+        occurrence = 0;
+        printedCode = printedCode.replace(/\r\n|\r|\n/g, function (match) {
+            occurrence += 1;
+            return occurrence === offendingLine ? '' : match;
+        });
+    }
+    return printedCode;
 };
 
 /**

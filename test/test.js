@@ -31,6 +31,9 @@ describe('replace', function () {
     it('should preserve directive placement', function (done) {
         inputOutputTest('directive', done);
     });
+    it('should preserve whitespace', function (done) {
+        inputOutputTest('whitespace', done);
+    });
     it('should rock angular\'s socks off', function (done) {
         inputOutputTest('angular', done);
     });
