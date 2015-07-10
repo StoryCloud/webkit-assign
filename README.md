@@ -28,11 +28,5 @@ as a workaround to prevent a `TypeError`.
 $ webkit-assign angular.js
 ```
 
-## Disclaimer
-
-The formatting, line/column numbers and comments of the original code are not
-preserved. Make sure to restore any licenses that might have been at the top of
-the transformed code.
-
 [WebKit issue #138038]: https://bugs.webkit.org/show_bug.cgi?id=138038
 [Angular.js]: https://angularjs.org/
