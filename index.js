@@ -29,6 +29,10 @@ var getOutputFile = function (file) {
     return path.join(directory, newName);
 };
 
+/**
+ * Traverse the SpiderMonkey AST node, calling `iteratee` on `node` and its
+ * children.
+ */
 var traverse = function traverse(node, iteratee) {
     iteratee(node);
     _.forOwn(node, function (child) {
@@ -44,8 +48,16 @@ var traverse = function traverse(node, iteratee) {
     });
 };
 
+/**
+ * Current the only directive is the Use Strict Directive (14.1.1).
+ */
 var DIRECTIVES = ['use strict'];
 
+/**
+ * Replace all instances of dot property assignment with bracket notation
+ * assignment in `rawCodeString`. Return a transformed and formatted version of
+ * the code.
+ */
 var transformCode = function (rawCodeString) {
     var ast = esprima.parse(rawCodeString);
     var propertyNames = [];
@@ -77,8 +89,7 @@ var transformCode = function (rawCodeString) {
             },
             init: {
                 type: 'Literal',
-                value: propertyName,
-                raw: '\'' + propertyName + '\'' // TODO: Necessary?
+                value: propertyName
             }
         }
         return declarations.concat(variableDeclarator);
@@ -108,6 +119,11 @@ var transformCode = function (rawCodeString) {
     return escodegen.generate(ast) + '\n'; // Add *nixy trailing newline.
 };
 
+/**
+ * Create a transformed version of each file in `files`, where the transformed
+ * version of "script.js" is called "script.webkitassign.js". Invoke `callback`
+ * when done.
+ */
 var webkitAssign = function (files, callback) {
     async.each(files, function (file, callback) {
         var outputFile = getOutputFile(file);
