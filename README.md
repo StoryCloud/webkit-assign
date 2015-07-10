@@ -30,18 +30,9 @@ $ webkit-assign angular.js
 
 ## Disclaimer
 
-The implementation uses a regular expression, so e.g. if there is a comment
-immediately after an assignment operator, your code might not be transformed
-correctly.
-
-Also, if there is a directive such as `"use strict";` at the beginning of your
-file (before anything else, barring comments), the `var` statement will be
-placed before it, which will negate the directive, as a directive must be the
-first thing in a script or function. So follow the best practice for browsers
-and put `"use strict";` inside a function.
-
-We may eventually rewrite this program to use an AST, which would fix these edge
-cases. Pull requests are welcome.
+The formatting, line/column numbers and comments of the original code are not
+preserved. Make sure to restore any licenses that might have been at the top of
+the transformed code.
 
 [WebKit issue #138038]: https://bugs.webkit.org/show_bug.cgi?id=138038
 [Angular.js]: https://angularjs.org/
