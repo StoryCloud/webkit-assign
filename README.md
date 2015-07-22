@@ -1,10 +1,10 @@
 # webkit-assign
 
-Due to [WebKit issue #138038][], assigning to properties on an object created
-with `Object.create` under strict mode may result in the error `TypeError:
-Attempted to assign to readonly property.`. This bug is known to affect iOS 8
-users and is particularly likely to happen in recent versions of [Angular.js][]
-(at least version `1.4.2`).
+Due to [WebKit issue #138038][], assigning to a property on an object created
+with `Object.create` may result in the error `TypeError: Attempted to assign to
+readonly property.`. This bug is known to affect iOS 8 users and is particularly
+likely to happen in recent versions of [Angular.js][] (at least version
+`1.4.2`).
 
 This utility rewrites the following code
 
@@ -21,10 +21,29 @@ object[__webkitAssign__$$a] = 5;
 
 as a workaround to prevent a `TypeError`.
 
-## Usage
+## Installation
+
+Via npm:
 
 ```bash
-# Create a transformed `angular.webkitassign.js` in the same directory:
+$ npm install -g webkit-assign
+```
+
+Via git:
+
+```bash
+$ git clone https://github.com/StoryCloud/webkit-assign.git
+$ cd webkit-assign
+$ npm install
+$ npm link
+```
+
+## Usage
+
+In a directory with the file `angular.js`, create a transformed
+`angular.webkitassign.js` in the same directory:
+
+```bash
 $ webkit-assign angular.js
 ```
 
