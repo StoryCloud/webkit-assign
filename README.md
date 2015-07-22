@@ -21,10 +21,28 @@ object[__webkitAssign__$$a] = 5;
 
 as a workaround to prevent a `TypeError`.
 
-## Usage
+## Installation
+
+Via npm:
 
 ```bash
-# Create a transformed `angular.webkitassign.js` in the same directory:
+$ npm install -g webkit-assign
+```
+
+Via git:
+
+```bash
+$ git clone https://github.com/StoryCloud/webkit-assign.git
+$ cd webkit-assign/
+$ npm install -g .
+```
+
+## Usage
+
+In a directory with the file `angular.js`, create a transformed
+`angular.webkitassign.js` in the same directory:
+
+```bash
 $ webkit-assign angular.js
 ```
 
