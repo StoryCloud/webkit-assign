@@ -33,8 +33,9 @@ Via git:
 
 ```bash
 $ git clone https://github.com/StoryCloud/webkit-assign.git
-$ cd webkit-assign/
-$ npm install -g .
+$ cd webkit-assign
+$ npm install
+$ npm link
 ```
 
 ## Usage
