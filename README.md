@@ -58,5 +58,16 @@ fs.createReadStream('bower_components/angular/angular.js')
     .pipe(fs.createWriteStream('build/scripts/angular.js'));
 ```
 
+We also offer a [gulp][] plugin:
+
+```js
+var gulp = require('gulp');
+var webkitAssign = require('webkit-assign/gulp');
+gulp.src('bower_components/angular/angular.js')
+    .pipe(webkitAssign())
+    .pipe(gulp.dest('build/scripts'));
+```
+
 [WebKit issue #138038]: https://bugs.webkit.org/show_bug.cgi?id=138038
 [Angular.js]: https://angularjs.org/
+[gulp]: http://gulpjs.com/

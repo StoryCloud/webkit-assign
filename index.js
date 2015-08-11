@@ -190,7 +190,10 @@ var webkitAssignFiles = function (files, callback) {
 };
 
 var webkitAssign = function (codeOrFiles, callback) {
-    if (_.isArray(codeOrFiles)) {
+    if (_.isString(codeOrFiles)) {
+        var code = codeOrFiles;
+        return transformCode(code);
+    } else if (_.isArray(codeOrFiles)) {
         var files = codeOrFiles;
         webkitAssignFiles(files, callback);
     } else if (arguments.length === 0) {
