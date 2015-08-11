@@ -31,7 +31,8 @@
     "async": "^1.2.0",
     "graceful-fs": "^3.0.8",
     "lodash": "^3.9.3",
-    "recast": "^0.10.19"
+    "recast": "^0.10.19",
+    "through2": "^2.0.0"
   },
   "devDependencies": {
     "mocha": "^2.2.5"
