@@ -5,6 +5,7 @@ var async = require('async');
 var fs = require('graceful-fs');
 var path = require('path');
 var recast = require('recast');
+var through2 = require('through2');
 
 /**
  * Extension to append to files to distinguish them from their original
@@ -147,24 +148,57 @@ var transformCode = function (rawCodeString) {
 };
 
 /**
+ * Return a stream that pipes in a whole file's contents and pipes out
+ * transformed code.
+ */
+var webkitAssignStream = function () {
+    var contents = '';
+    return through2(function (chunk, encoding, callback) {
+        // `encoding` is not used here.
+        /* jshint unused: true */
+        contents += chunk;
+        callback();
+    }, function (callback) {
+        var transformedCode = transformCode(contents);
+        this.push(transformedCode);
+        callback();
+    });
+};
+
+/**
  * Create a transformed version of each file in `files`, where the transformed
  * version of "script.js" is called "script.webkitassign.js". Invoke `callback`
  * when done.
  */
-var webkitAssign = function (files, callback) {
+var webkitAssignFiles = function (files, callback) {
     async.each(files, function (file, callback) {
-        var outputFile = getOutputFile(file);
-        fs.readFile(file, {
+        callback = _.once(callback);
+        var readStream = fs.createReadStream(file, {
             encoding: 'utf8'
-        }, function (error, contents) {
-            if (error) {
-                callback(error);
-            } else {
-                var transformedCode = transformCode(contents);
-                fs.writeFile(outputFile, transformedCode, callback);
-            }
         });
+        var transformStream = webkitAssignStream();
+        var outputFile = getOutputFile(file);
+        var writeStream = fs.createWriteStream(outputFile);
+        readStream
+            .on('error', callback)
+            .pipe(transformStream)
+            .on('error', callback)
+            .pipe(writeStream)
+            .on('error', callback)
+            .on('close', callback);
     }, callback);
+};
+
+var webkitAssign = function (codeOrFiles, callback) {
+    if (_.isString(codeOrFiles)) {
+        var code = codeOrFiles;
+        return transformCode(code);
+    } else if (_.isArray(codeOrFiles)) {
+        var files = codeOrFiles;
+        webkitAssignFiles(files, callback);
+    } else if (arguments.length === 0) {
+        return webkitAssignStream();
+    }
 };
 
 module.exports = webkitAssign;

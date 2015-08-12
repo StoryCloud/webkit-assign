@@ -1,14 +1,18 @@
 'use strict';
 
 var assert = require('assert');
-var webkitAssign = require('../index');
 var fs = require('graceful-fs');
+var gulpPlugin = require('../gulp');
+var gutil = require('gulp-util');
 var path = require('path');
+var webkitAssign = require('../index');
+
+var getFileContents = function (file) {
+    return fs.readFileSync(path.resolve(file), 'utf8');
+};
 
 var assertFilesEqual = function (a, b) {
-    a = path.resolve(a);
-    b = path.resolve(b);
-    assert.strictEqual(fs.readFileSync(a, 'utf8'), fs.readFileSync(b, 'utf8'));
+    assert.strictEqual(getFileContents(a), getFileContents(b));
 };
 
 var inputOutputTest = function (prefix, done) {
@@ -36,5 +40,27 @@ describe('replace', function () {
     });
     it('should rock angular\'s socks off', function (done) {
         inputOutputTest('angular', done);
+    });
+});
+
+describe('gulp', function () {
+    // Based on https://github.com/sindresorhus/gulp-plugin-boilerplate/blob/master/test.js
+    it('should transform as a gulp plugin', function (done) {
+        var stream = gulpPlugin();
+        stream.on('data', function (file) {
+            assert.strictEqual(
+                file.contents.toString(),
+                getFileContents('./test/fixtures/replace.expected.js')
+            );
+        });
+        stream.on('error', done);
+        stream.on('end', done);
+        var fixture = './test/fixtures/replace.input.js';
+        stream.write(new gutil.File({
+            base: path.resolve('./test/fixtures'),
+            path: path.resolve(fixture),
+            contents: new Buffer(getFileContents(fixture))
+        }));
+        stream.end();
     });
 });
