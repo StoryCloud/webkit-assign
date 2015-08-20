@@ -68,6 +68,17 @@ gulp.src('bower_components/angular/angular.js')
     .pipe(gulp.dest('build/scripts'));
 ```
 
+And a [Browserify][] transform:
+
+```js
+"browserify": {
+  "transform": [
+    "webkit-assign/browserify"
+  ]
+}
+```
+
 [WebKit issue #138038]: https://bugs.webkit.org/show_bug.cgi?id=138038
 [Angular.js]: https://angularjs.org/
 [gulp]: http://gulpjs.com/
+[Browserify]: http://browserify.org/
