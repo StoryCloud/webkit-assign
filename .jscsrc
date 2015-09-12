@@ -1,0 +1,20 @@
+{
+  "disallowDanglingUnderscores": null,
+  "disallowFunctionDeclarations": true,
+  "disallowSpaceAfterObjectKeys": true,
+  "excludeFiles": [
+    "test/fixtures"
+  ],
+  "preset": "crockford",
+  "requireLineBreakAfterVariableAssignment": true,
+  "requireMultipleVarDecl": null,
+  "requirePaddingNewLinesInObjects": true,
+  "requireSpaceAfterLineComment": true,
+  "requireVarDeclFirst": null,
+  "validateAlignedFunctionParameters": {
+    "lineBreakAfterOpeningBrace": true,
+    "lineBreakBeforeClosingBrace": true
+  },
+  "validateLineBreaks": "LF",
+  "validateQuoteMarks": "'"
+}

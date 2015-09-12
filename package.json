@@ -7,7 +7,8 @@
     "webkit-assign": "./cli.js"
   },
   "scripts": {
-    "test": "mocha"
+    "lint": "jshint . && jscs . test",
+    "test": "npm run lint && mocha"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,8 @@
     "through2": "^2.0.0"
   },
   "devDependencies": {
+    "jscs": "^2.1.1",
+    "jshint": "^2.8.0",
     "mocha": "^2.2.5"
   }
 }
