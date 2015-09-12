@@ -1,4 +1,4 @@
-# webkit-assign
+# webkit-assign [![Build Status](https://travis-ci.org/StoryCloud/webkit-assign.svg?branch=master)](https://travis-ci.org/StoryCloud/webkit-assign)
 
 Due to [WebKit issue #138038][], assigning to a property on an object created
 with `Object.create` may result in the error `TypeError: Attempted to assign to
