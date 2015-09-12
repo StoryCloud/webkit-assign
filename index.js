@@ -51,7 +51,7 @@ var getNumberOfLines = function (string) {
 };
 
 /**
- * Current the only directive is the Use Strict Directive (14.1.1).
+ * Currently the only directive is the Use Strict Directive (14.1.1).
  */
 var DIRECTIVES = ['use strict'];
 
