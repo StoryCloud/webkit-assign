@@ -37,6 +37,7 @@
     "through2": "^2.0.0"
   },
   "devDependencies": {
+    "browserify-transform-tools": "^1.5.0",
     "jscs": "^2.1.1",
     "jshint": "^2.8.0",
     "mocha": "^2.2.5"

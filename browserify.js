@@ -8,7 +8,28 @@
 'use strict';
 
 var webkitAssign = require('./index');
+var through2 = require('through2');
+var _ = require('lodash');
 
-module.exports = function () {
-    return webkitAssign();
+var defaultOptions = {
+    extension: ['.js']
+};
+
+module.exports = function (file, options) {
+    // Merge options with default options
+    _.defaults(options, defaultOptions);
+    // Turn single extention option from CLI into array
+    if (!_.isArray(options.extension)) {
+        options.extension = [options.extension];
+    }
+    // Check if it matches accepting extention
+    var match = _.any(options.extension, function (opt) {
+        return _.endsWith(file, opt);
+    });
+
+    if (match) {
+        return webkitAssign();
+    } else {
+        return through2();
+    }
 };
