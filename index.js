@@ -51,7 +51,7 @@ var getNumberOfLines = function (string) {
 };
 
 /**
- * Current the only directive is the Use Strict Directive (14.1.1).
+ * Currently the only directive is the Use Strict Directive (14.1.1).
  */
 var DIRECTIVES = ['use strict'];
 
@@ -80,9 +80,12 @@ var transformCode = function (rawCodeString) {
             }
         }
     });
+    if (propertyNames.length === 0) {
+        return rawCodeString;
+    }
     // Generate "enum" variable declarations for all the strings needed for
     // bracket notation assignments.
-    var declarations = _.reduce(propertyNames, function (declarations, propertyName) {
+    var declarations = _.map(propertyNames, function (propertyName) {
         var variableDeclarator = {
             type: 'VariableDeclarator',
             id: {
@@ -94,8 +97,8 @@ var transformCode = function (rawCodeString) {
                 value: propertyName
             }
         };
-        return declarations.concat(variableDeclarator);
-    }, []);
+        return variableDeclarator;
+    });
     var variableDeclaration = {
         type: 'VariableDeclaration',
         declarations: declarations,

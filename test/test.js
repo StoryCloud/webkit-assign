@@ -49,6 +49,9 @@ describe('replace', function () {
     it('should rock angular\'s socks off', function (done) {
         inputOutputTest('angular', done);
     });
+    it('should do nothing when there are no properties', function (done) {
+        inputOutputTest('no-properties', done);
+    });
 });
 
 describe('gulp', function () {
