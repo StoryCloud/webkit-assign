@@ -34,18 +34,16 @@ var getOutputFile = function (file) {
  * children.
  */
 var traverse = function traverse(node, iteratee) {
-    iteratee(node);
-    _.forOwn(node, function (child) {
-        if (_.isObject(child)) {
-            if (_.isArray(child)) {
-                _.forEach(child, function (node) {
-                    traverse(node, iteratee);
-                });
-            } else {
-                traverse(child, iteratee);
-            }
-        }
-    });
+    if (_.isArray(node)) {
+        _.forEach(node, function (child) {
+            traverse(child, iteratee);
+        });
+    } else if (_.isObject(node)) {
+        iteratee(node);
+        _.forOwn(node, function (child) {
+            traverse(child, iteratee);
+        });
+    }
 };
 
 var getNumberOfLines = function (string) {
