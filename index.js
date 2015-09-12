@@ -80,6 +80,9 @@ var transformCode = function (rawCodeString) {
             }
         }
     });
+    if (propertyNames.length === 0) {
+        return rawCodeString;
+    }
     // Generate "enum" variable declarations for all the strings needed for
     // bracket notation assignments.
     var declarations = _.map(propertyNames, function (propertyName) {
