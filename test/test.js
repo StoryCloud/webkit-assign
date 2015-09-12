@@ -28,6 +28,14 @@ var inputOutputTest = function (prefix, done) {
     });
 };
 
+describe('parse', function () {
+    it('should not fail on null nodes', function () {
+        assert.doesNotThrow(function () {
+            webkitAssign('[,0]');
+        });
+    });
+});
+
 describe('replace', function () {
     it('should replace properties with variables', function (done) {
         inputOutputTest('replace', done);
