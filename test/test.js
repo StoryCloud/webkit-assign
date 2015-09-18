@@ -52,6 +52,9 @@ describe('replace', function () {
     it('should do nothing when there are no properties', function (done) {
         inputOutputTest('no-properties', done);
     });
+    it('should only create one variable per name', function (done) {
+        inputOutputTest('duplicates', done);
+    });
 });
 
 describe('gulp', function () {
