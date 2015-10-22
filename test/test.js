@@ -1,10 +1,12 @@
 'use strict';
 
 var assert = require('assert');
+var browserify = require('../browserify');
 var fs = require('graceful-fs');
 var gulpPlugin = require('../gulp');
 var gutil = require('gulp-util');
 var path = require('path');
+var transformTools = require('browserify-transform-tools');
 var webkitAssign = require('../index');
 
 var getFileContents = function (file) {
@@ -76,5 +78,39 @@ describe('gulp', function () {
             contents: new Buffer(getFileContents(fixture))
         }));
         stream.end();
+    });
+});
+
+describe('browserify', function () {
+    var input = './test/fixtures/replace.input.js';
+    var expected = './test/fixtures/replace.expected.js';
+    var options = {
+        config: {}
+    };
+    it('should work as a browserify transform', function (done) {
+        transformTools.runTransform(browserify, input, options, function (err, result) {
+            if (err) {
+                return done(err);
+            }
+
+            assert.strictEqual(result, getFileContents(expected));
+            done();
+        });
+    });
+
+    it('should filter based on extension', function (done) {
+        var options = {
+            config: {
+                extension: []
+            }
+        };
+        transformTools.runTransform(browserify, input, options, function (err, result) {
+            if (err) {
+                return done(err);
+            }
+
+            assert.strictEqual(result, getFileContents(input));
+            done();
+        });
     });
 });
