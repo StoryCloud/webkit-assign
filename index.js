@@ -114,7 +114,7 @@ var transformCode = function (rawCodeString) {
         if (
             node.type === 'ExpressionStatement' &&
             node.expression.type === 'Literal' &&
-            _.contains(DIRECTIVES, node.expression.value)
+            _.includes(DIRECTIVES, node.expression.value)
         ) {
             startIndex = index + 1;
             startNode = node;
