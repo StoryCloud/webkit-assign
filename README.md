@@ -89,6 +89,27 @@ loaders: [
 ]
 ```
 
+## Contributing
+
+Install npm modules
+
+```
+npm install
+```
+
+Run lint against any changes
+
+```
+npm run lint
+```
+
+Run tests against any changes
+
+```
+npm run test
+```
+
+
 [WebKit issue #138038]: https://bugs.webkit.org/show_bug.cgi?id=138038
 [Angular.js]: https://angularjs.org/
 [gulp]: http://gulpjs.com/
