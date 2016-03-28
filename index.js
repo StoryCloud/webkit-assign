@@ -83,7 +83,7 @@ var transformCode = function (rawCodeString) {
     if (propertyNames.length === 0) {
         return rawCodeString;
     }
-    propertyNames = _.unique(propertyNames);
+    propertyNames = _.uniq(propertyNames);
     // Generate "enum" variable declarations for all the strings needed for
     // bracket notation assignments.
     var declarations = _.map(propertyNames, function (propertyName) {
@@ -114,7 +114,7 @@ var transformCode = function (rawCodeString) {
         if (
             node.type === 'ExpressionStatement' &&
             node.expression.type === 'Literal' &&
-            _.contains(DIRECTIVES, node.expression.value)
+            _.includes(DIRECTIVES, node.expression.value)
         ) {
             startIndex = index + 1;
             startNode = node;

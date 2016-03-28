@@ -29,17 +29,17 @@
   },
   "homepage": "https://github.com/StoryCloud/webkit-assign",
   "dependencies": {
-    "async": "^1.2.0",
-    "graceful-fs": "^3.0.8",
-    "gulp-util": "^3.0.6",
-    "lodash": "^3.9.3",
-    "recast": "^0.10.19",
-    "through2": "^2.0.0"
+    "async": "^1.5.2",
+    "graceful-fs": "^4.1.3",
+    "gulp-util": "^3.0.7",
+    "lodash": "^4.5.1",
+    "recast": "^0.11.2",
+    "through2": "^2.0.1"
   },
   "devDependencies": {
-    "browserify-transform-tools": "^1.5.0",
-    "jscs": "^2.1.1",
-    "jshint": "^2.8.0",
-    "mocha": "^2.2.5"
+    "browserify-transform-tools": "^1.5.3",
+    "jscs": "^2.10.1",
+    "jshint": "^2.9.1",
+    "mocha": "^2.4.5"
   }
 }

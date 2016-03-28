@@ -23,7 +23,7 @@ module.exports = function (file, options) {
         options.extension = [options.extension];
     }
     // Check if it matches accepting extention
-    var match = _.any(options.extension, function (opt) {
+    var match = _.some(options.extension, function (opt) {
         return _.endsWith(file, opt);
     });
 
