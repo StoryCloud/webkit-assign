@@ -63,21 +63,26 @@ var DIRECTIVES = ['use strict'];
 var transformCode = function (rawCodeString) {
     var ast = recast.parse(rawCodeString);
     var propertyNames = [];
-    traverse(ast.program, function (node) {
+    var protectProperty = function (node) {
         var propertyName;
+        if (node.type === 'MemberExpression' && node.computed === false) {
+            propertyName = node.property.name;
+            propertyNames.push(propertyName);
+            // Use bracket notation for the assignment.
+            _.merge(node, {
+                computed: true,
+                property: {
+                    type: 'Identifier',
+                    name: NAMESPACE + propertyName
+                }
+            });
+        }
+    };
+    traverse(ast.program, function (node) {
         if (node.type === 'AssignmentExpression') {
-            if (node.left.type === 'MemberExpression' && node.left.computed === false) {
-                propertyName = node.left.property.name;
-                propertyNames.push(propertyName);
-                // Use bracket notation for the assignment.
-                _.merge(node.left, {
-                    computed: true,
-                    property: {
-                        type: 'Identifier',
-                        name: NAMESPACE + propertyName
-                    }
-                });
-            }
+            protectProperty(node.left);
+        } else if (node.type === 'UpdateExpression') {
+            protectProperty(node.argument);
         }
     });
     if (propertyNames.length === 0) {

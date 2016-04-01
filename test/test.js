@@ -42,6 +42,9 @@ describe('replace', function () {
     it('should replace properties with variables', function (done) {
         inputOutputTest('replace', done);
     });
+    it('should protect against increment / decrement operators', function (done) {
+        inputOutputTest('increment-decrement', done);
+    });
     it('should preserve directive placement', function (done) {
         inputOutputTest('directive', done);
     });
